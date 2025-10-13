@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Digital Piggy Bank</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;transition:0.3s;}
+body{background:linear-gradient(135deg,#667eea,#764ba2,#ec4899);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+.container{width:95%;max-width:1000px;background:rgba(255,255,255,0.15);border-radius:20px;backdrop-filter:blur(15px);box-shadow:0 10px 30px rgba(0,0,0,0.3);padding:30px;display:flex;flex-direction:column;}
+header{text-align:center;color:#fff;margin-bottom:20px;}
+header h1{font-size:2.5rem;color:#ffe57f;text-shadow:0 0 10px rgba(255,229,127,0.6);}
+.section{background:rgba(255,255,255,0.2);border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+h2{color:#ffe57f;margin-bottom:10px;}
+p{margin:6px 0;color:#fff;font-weight:500;}
+.label{font-weight:600;color:#fff;}
+input{padding:10px;border-radius:10px;border:none;outline:none;margin-right:10px;flex:1;}
+button{border:none;padding:8px 15px;border-radius:10px;cursor:pointer;margin-top:10px;color:#fff;font-weight:600;transition:0.3s;}
+button:hover{opacity:0.9;transform:scale(1.05);}
+button.add-btn{background:linear-gradient(45deg,#22c55e,#16a34a);}
+button.withdraw-btn{background:linear-gradient(45deg,#ef4444,#b91c1c);}
+button.edit-btn{background:linear-gradient(45deg,#facc15,#eab308);color:black;}
+button.save-btn{background:linear-gradient(45deg,#06b6d4,#0ea5e9);}
+.progress-container{width:100%;background:rgba(255,255,255,0.3);height:25px;border-radius:20px;overflow:hidden;margin-top:10px;}
+.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#84fab0,#8fd3f4);border-radius:20px;transition:width 0.5s;}
+.flex-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+table{width:100%;border-collapse:collapse;margin-top:15px;border-radius:10px;overflow:hidden;}
+table th,table td{padding:10px;text-align:center;}
+table th{background:rgba(255,255,255,0.25); color:#fff;}
+table tr:nth-child(even){background:rgba(255,255,255,0.1);}
+.add-row{background:rgba(34,197,94,0.3);}
+.withdraw-row{background:rgba(239,68,68,0.3);}
+.goal-row{background:rgba(250,204,21,0.3);}
+footer{text-align:center;color:#fff;opacity:0.8;margin-top:20px;}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <header>
+    <h1><i class="fas fa-piggy-bank"></i> Digital Piggy Bank</h1>
+    <p>Welcome, <span id="userName">Gayatri</span>!</p>
+  </header>
+
+  <div class="section">
+    <h2><i class="fas fa-user-circle"></i> Account Details</h2>
+    <p><span class="label">Account No:</span> <span id="accNumber">123456789</span></p>
+    <p><span class="label">Balance:</span> ₹<span id="balance">5000</span></p>
+    <div class="flex-row">
+      <input type="text" id="nameInput" placeholder="Change Name"/>
+      <button onclick="updateName()">Save Name</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><i class="fas fa-bullseye"></i> Saving Goal 🎯</h2>
+    <p><span class="label">Goal:</span> <span id="goalName">New Phone</span></p>
+    <p><span class="label">Target:</span> ₹<span id="targetAmount">10000</span></p>
+    <p><span class="label">Saved:</span> ₹<span id="savedAmount">3000</span></p>
+
+    <div class="progress-container">
+      <div id="progress" class="progress-bar"></div>
+    </div>
+
+    <div class="flex-row">
+      <input type="number" id="addAmount" placeholder="Add/Withdraw amount"/>
+      <button class="add-btn" onclick="addSavings()"><i class="fas fa-plus-circle"></i> Add</button>
+      <button class="withdraw-btn" onclick="withdrawSavings()"><i class="fas fa-minus-circle"></i> Withdraw</button>
+      <button class="edit-btn" onclick="toggleEditGoal()"><i class="fas fa-edit"></i> Edit Goal</button>
+    </div>
+
+    <div id="editGoalSection" class="flex-row" style="display:none;">
+      <input type="text" id="newGoalName" placeholder="New Goal Name"/>
+      <input type="number" id="newTargetAmount" placeholder="New Target"/>
+      <button class="save-btn" onclick="saveGoal()"><i class="fas fa-check"></i> Save Goal</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><i class="fas fa-history"></i> Transaction History</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Date & Time</th>
+          <th>Type</th>
+          <th>Amount (₹)</th>
+          <th>Balance After</th>
+        </tr>
+      </thead>
+      <tbody id="transactionTable">
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    💰 Keep saving for a bright future!
+  </footer>
+</div>
+
+<script>
+let balance=5000,saved=3000,target=10000,transactions=[];
+
+function updateProgress(){
+  document.getElementById("savedAmount").textContent=saved;
+  document.getElementById("balance").textContent=balance;
+  const progress=Math.min((saved/target)*100,100);
+  document.getElementById("progress").style.width=progress+"%";
+}
+
+function updateName(){
+  const name=document.getElementById("nameInput").value.trim();
+  if(name){document.getElementById("userName").textContent=name; document.getElementById("nameInput").value="";}
+}
+
+function addSavings(){
+  const amount=parseInt(document.getElementById("addAmount").value);
+  if(!isNaN(amount)&&amount>0){
+    saved+=amount; balance-=amount;
+    addTransaction("Add",amount,balance);
+    updateProgress(); document.getElementById("addAmount").value="";
+  }else alert("Enter valid amount!");
+}
+
+function withdrawSavings(){
+  const amount=parseInt(document.getElementById("addAmount").value);
+  if(!isNaN(amount)&&amount>0&&saved>=amount){
+    saved-=amount; balance+=amount;
+    addTransaction("Withdraw",amount,balance);
+    updateProgress(); document.getElementById("addAmount").value="";
+  }else alert("Invalid or insufficient amount!");
+}
+
+function toggleEditGoal(){document.getElementById("editGoalSection").style.display=document.getElementById("editGoalSection").style.display==='none'?'flex':'none';}
+
+function saveGoal(){
+  const newGoal=document.getElementById("newGoalName").value;
+  const newTarget=parseInt(document.getElementById("newTargetAmount").value);
+  if(newGoal&&!isNaN(newTarget)&&newTarget>0){
+    document.getElementById("goalName").textContent=newGoal;
+    document.getElementById("targetAmount").textContent=newTarget;
+    target=newTarget; saved=0;
+    addTransaction("Goal Changed",0,balance,newGoal);
+    updateProgress(); document.getElementById("editGoalSection").style.display='none';
+  }else alert("Enter valid goal details!");
+}
+
+function addTransaction(type,amount,balanceAfter,note=""){
+  const now=new Date();
+  transactions.unshift({date:now.toLocaleString(),type,amount,balanceAfter,note});
+  renderTransactions();
+}
+
+function renderTransactions(){
+  const tbody=document.getElementById("transactionTable");
+  tbody.innerHTML="";
+  transactions.forEach(tx=>{
+    const tr=document.createElement("tr");
+    tr.className=tx.type==="Add"?"add-row":tx.type==="Withdraw"?"withdraw-row":"goal-row";
+    tr.innerHTML=`<td>${tx.date}</td><td>${tx.type}</td><td>${tx.amount}</td><td>${tx.balanceAfter}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+updateProgress();
+</script>
+</body>
+</html>
