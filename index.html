@@ -1,170 +1,628 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Digital Piggy Bank</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Digital Piggy Bank — Centered + Sticky Header + Fixed Logout</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;transition:0.3s;}
-body{background:linear-gradient(135deg,#667eea,#764ba2,#ec4899);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
-.container{width:95%;max-width:1000px;background:rgba(255,255,255,0.15);border-radius:20px;backdrop-filter:blur(15px);box-shadow:0 10px 30px rgba(0,0,0,0.3);padding:30px;display:flex;flex-direction:column;}
-header{text-align:center;color:#fff;margin-bottom:20px;}
-header h1{font-size:2.5rem;color:#ffe57f;text-shadow:0 0 10px rgba(255,229,127,0.6);}
-.section{background:rgba(255,255,255,0.2);border-radius:15px;padding:20px;margin-bottom:20px;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-h2{color:#ffe57f;margin-bottom:10px;}
-p{margin:6px 0;color:#fff;font-weight:500;}
-.label{font-weight:600;color:#fff;}
-input{padding:10px;border-radius:10px;border:none;outline:none;margin-right:10px;flex:1;}
-button{border:none;padding:8px 15px;border-radius:10px;cursor:pointer;margin-top:10px;color:#fff;font-weight:600;transition:0.3s;}
-button:hover{opacity:0.9;transform:scale(1.05);}
-button.add-btn{background:linear-gradient(45deg,#22c55e,#16a34a);}
-button.withdraw-btn{background:linear-gradient(45deg,#ef4444,#b91c1c);}
-button.edit-btn{background:linear-gradient(45deg,#facc15,#eab308);color:black;}
-button.save-btn{background:linear-gradient(45deg,#06b6d4,#0ea5e9);}
-.progress-container{width:100%;background:rgba(255,255,255,0.3);height:25px;border-radius:20px;overflow:hidden;margin-top:10px;}
-.progress-bar{height:100%;width:0%;background:linear-gradient(90deg,#84fab0,#8fd3f4);border-radius:20px;transition:width 0.5s;}
-.flex-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
-table{width:100%;border-collapse:collapse;margin-top:15px;border-radius:10px;overflow:hidden;}
-table th,table td{padding:10px;text-align:center;}
-table th{background:rgba(255,255,255,0.25); color:#fff;}
-table tr:nth-child(even){background:rgba(255,255,255,0.1);}
-.add-row{background:rgba(34,197,94,0.3);}
-.withdraw-row{background:rgba(239,68,68,0.3);}
-.goal-row{background:rgba(250,204,21,0.3);}
-footer{text-align:center;color:#fff;opacity:0.8;margin-top:20px;}
+  /* base */
+  *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+  html,body{height:100%;margin:0}
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    background: linear-gradient(135deg,#0f172a,#4c1d95 45%,#f97316 100%);
+    color:#fff;
+    padding:20px;
+  }
+
+  /* outer centered shell */
+  .shell{
+    width:100%;
+    max-width:1100px;
+    margin:0 auto;
+    background: rgba(255,255,255,0.03);
+    border-radius:14px;
+    padding:18px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    align-items:stretch;
+    position:relative;
+  }
+
+  /* header / tagline centered */
+  .header {
+    text-align:center;
+    margin-bottom:4px;
+  }
+  .title-main { font-size:1.35rem; color:#ffe57f; font-weight:700; }
+  .subtitle { color:rgba(255,255,255,0.85); font-size:0.95rem; }
+
+  /* tabs row */
+  .tabs { display:flex; gap:8px; justify-content:center; margin:6px 0 12px 0; }
+  .tab { padding:8px 14px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,0.02); color:#cfe9ff; font-weight:700; }
+  .tab.active{ background: linear-gradient(45deg,#06b6d4,#8b5cf6); color:#041020; }
+
+  /* centered inner content */
+  .centered {
+    width:100%;
+    max-width:980px;
+    margin:0 auto;
+  }
+
+  /* grid layout */
+  .grid {
+    display:grid;
+    grid-template-columns: 360px minmax(520px,1fr);
+    gap:18px;
+    align-items:start;
+  }
+  @media (max-width:920px){
+    .grid { grid-template-columns: 1fr; padding:0 8px; }
+  }
+
+  .card, .left-card { background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; width:100%; }
+  .form{ display:flex; flex-direction:column; gap:10px; }
+  .input{ padding:10px 12px; border-radius:10px; border:none; outline:none; background:rgba(255,255,255,0.03); color:#fff; }
+  .btn{ padding:10px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:800; }
+  .btn.primary{ background:linear-gradient(45deg,#22c55e,#16a34a); color:#041020; }
+  .btn.secondary{ background:linear-gradient(45deg,#06b6d4,#8b5cf6); color:#041020; }
+  .btn.warn{ background:linear-gradient(45deg,#facc15,#eab308); color:#041020; }
+  .btn.danger{ background:linear-gradient(45deg,#ef4444,#c026d3); color:#fff; }
+  .label{ color:#e6f2ff; font-weight:700; margin-bottom:6px; }
+  .title{ font-size:1.1rem; color:#ffe57f; margin-bottom:6px; }
+  .small{ font-size:0.9rem; color:rgba(255,255,255,0.85); }
+  .kv{ color:#cfe9ff; font-weight:800; }
+  table{ width:100%; border-collapse:collapse; margin-top:10px; }
+  th,td{ padding:8px; text-align:left; color:#e8f6ff; border-bottom:1px solid rgba(255,255,255,0.03); }
+  .tx-add{ background: linear-gradient(90deg, rgba(34,197,94,0.14), rgba(34,197,94,0.05)); }
+  .tx-with{ background: linear-gradient(90deg, rgba(239,68,68,0.12), rgba(239,68,68,0.04)); }
+  .tx-dep{ background: linear-gradient(90deg, rgba(59,130,246,0.12), rgba(59,130,246,0.04)); }
+  .tx-goal{ background: linear-gradient(90deg, rgba(250,204,21,0.12), rgba(250,204,21,0.04)); }
+
+  /* modal */
+  .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); z-index:9999; }
+  .modal .box{ width:95%; max-width:480px; padding:16px; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border-radius:10px; }
+
+  /* make the dashboard header sticky */
+  #appHeader {
+    position: sticky;
+    top: 12px;
+    z-index: 1000;
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.04));
+    border-radius: 8px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* fixed logout button (always visible while logged in) */
+  #btnLogoutFixed {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1100;
+    display: none;             /* shown only when logged in */
+    width:44px;
+    height:44px;
+    padding:0;
+    border-radius:50%;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    border:none;
+    cursor:pointer;
+    font-weight:700;
+    background: linear-gradient(45deg,#ef4444,#c026d3);
+    color:#fff;
+  }
+  #btnLogoutFixed:hover{ transform: translateY(-2px); }
+
+  /* ensure authArea/appArea center their inner content */
+  #authArea, #appArea { display:flex; justify-content:center; width:100%; }
+  #authArea .centered, #appArea .centered { width:100%; }
+
+  /* small responsive tweaks */
+  @media (max-width:520px){
+    #btnLogoutFixed { top: 10px; right: 10px; width:40px; height:40px; }
+  }
 </style>
 </head>
-
 <body>
-<div class="container">
-  <header>
-    <h1><i class="fas fa-piggy-bank"></i> Digital Piggy Bank</h1>
-    <p>Welcome, <span id="userName">Gayatri</span>!</p>
-  </header>
-
-  <div class="section">
-    <h2><i class="fas fa-user-circle"></i> Account Details</h2>
-    <p><span class="label">Account No:</span> <span id="accNumber">123456789</span></p>
-    <p><span class="label">Balance:</span> ₹<span id="balance">5000</span></p>
-    <div class="flex-row">
-      <input type="text" id="nameInput" placeholder="Change Name"/>
-      <button onclick="updateName()">Save Name</button>
+  <div class="shell">
+    <div class="header">
+      <div class="title-main">Digital Piggy Bank</div>
+      <div class="subtitle">Plan. Save. Celebrate — your private savings dashboard</div>
     </div>
+
+    <!-- AUTH -->
+    <div id="authArea">
+      <div class="centered">
+        <div class="tabs">
+          <div id="tabLogin" class="tab active">Login</div>
+          <div id="tabSignup" class="tab">Signup</div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <!-- login -->
+            <div id="loginForm" class="left-card form">
+              <label class="label">Username</label>
+              <input id="loginUsername" class="input" placeholder="username" />
+              <label class="label">Password</label>
+              <input id="loginPassword" class="input" type="password" placeholder="password" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="btnLogin" class="btn primary">Login</button>
+                <button id="btnGuest" class="btn secondary">Guest Demo</button>
+              </div>
+              <div id="loginMsg" class="small" style="margin-top:8px"></div>
+            </div>
+
+            <!-- signup -->
+            <div id="signupForm" class="left-card form" style="display:none; margin-top:12px">
+              <label class="label">Username</label>
+              <input id="signupUsername" class="input" placeholder="username (unique)" />
+              <label class="label">Email</label>
+              <input id="signupEmail" class="input" placeholder="you@example.com" />
+              <label class="label">Password</label>
+              <input id="signupPassword" class="input" type="password" placeholder="min 6 chars" />
+              <label class="label">Optional PIN (4-6 digits)</label>
+              <input id="signupPin" class="input" type="password" placeholder="PIN (optional)" />
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="btnSignup" class="btn primary">Create account</button>
+                <button id="btnClear" class="btn">Clear</button>
+              </div>
+              <div id="signupMsg" class="small" style="margin-top:8px"></div>
+            </div>
+          </div>
+
+          <!-- right cards -->
+          <div>
+            <div class="card">
+              <div class="title">What is Digital Piggy Bank?</div>
+              <div class="small">
+                Plan and reach your saving goals. Deposit money into your account, transfer funds to goals, and track every transaction —
+                all in a simple personal dashboard that runs locally on your browser.
+              </div>
+              <div style="margin-top:8px" class="small">
+                Features: Goals & progress, transaction history, secure local account, change PIN/password, downloadable statements.
+              </div>
+            </div>
+
+            <div class="card" style="margin-top:12px">
+              <div class="title">How to get started</div>
+              <ol class="small" style="padding-left:18px; margin-top:8px;">
+                <li>Create a local account (stored on this browser).</li>
+                <li>Login — open your private dashboard.</li>
+                <li>Use <strong>Deposit</strong> to add funds, <strong>Add</strong> to move funds into a goal, and <strong>Withdraw</strong> when needed.</li>
+                <li>Visit Account → Change PIN/Password to secure access.</li>
+              </ol>
+              <div style="margin-top:8px" class="small">Tip: Use the Guest demo account to explore the app before creating your own.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP / DASHBOARD -->
+    <div id="appArea" style="display:none;">
+      <div class="centered">
+
+        <!-- Sticky header (keeps title + small text + logout visible while scrolling) -->
+        <div id="appHeader">
+          <div>
+            <div class="title">Your Piggy Bank</div>
+            <div class="small">Private dashboard (local only)</div>
+          </div>
+          <div>
+            <button id="btnLogout" class="btn danger">Logout</button>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-bottom:12px">
+          <div class="left-card">
+            <div><strong class="label">Account</strong></div>
+            <div style="margin-top:8px"><div class="small">Name</div><div class="kv" id="accName">—</div></div>
+            <div style="margin-top:8px"><div class="small">Username</div><div class="kv" id="accUser">—</div></div>
+            <div style="margin-top:8px"><div class="small">Email</div><div class="kv" id="accEmail">—</div></div>
+            <div style="margin-top:8px"><div class="small">Account No</div><div class="kv" id="accNo">—</div></div>
+            <div style="margin-top:8px"><div class="small">Balance</div><div class="kv" id="accBal">₹0.00</div></div>
+
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <input id="changeNameInput" class="input" placeholder="Change name" />
+              <button class="btn primary" onclick="changeNameFromInput()">Save</button>
+            </div>
+
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn secondary" onclick="openModal('modalChangePass')">Change Password</button>
+              <button class="btn secondary" onclick="openModal('modalChangePin')">Change PIN</button>
+            </div>
+
+            <div style="margin-top:12px" class="small">Download: <button class="btn" onclick="downloadStatement()">Statement</button></div>
+          </div>
+
+          <div>
+            <div class="card" style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div><strong class="label">Goal</strong><div class="kv" id="dashGoalName">—</div></div>
+                <div style="text-align:right"><div class="small">Target</div><div class="kv" id="dashGoalTarget">₹0</div></div>
+              </div>
+
+              <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+                <input id="dashAmount" class="input" placeholder="amount (₹)" style="min-width:160px" />
+                <button class="btn primary" onclick="dashAdd()">+ Add (from balance)</button>
+                <button class="btn" onclick="dashWithdraw()">- Withdraw (to balance)</button>
+              </div>
+
+              <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+                <input id="depositAmount" class="input" placeholder="Deposit to bank (₹)" style="min-width:160px" />
+                <button class="btn secondary" onclick="depositToBank()">💳 Deposit</button>
+              </div>
+
+              <div style="margin-top:12px">
+                <button class="btn warn" onclick="openEditGoal()">Edit Goal</button>
+              </div>
+
+              <div id="editGoalBox" style="display:none;margin-top:12px">
+                <input id="editGoalName" class="input" placeholder="New goal name" />
+                <input id="editGoalTarget" class="input" placeholder="New target amount" type="number" />
+                <div style="margin-top:8px;display:flex;gap:8px">
+                  <button class="btn primary" onclick="saveGoalFromDash()">Save Goal</button>
+                  <button class="btn" onclick="closeEditGoal()">Cancel</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="label">Progress</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:8px">
+                <div style="flex:1">
+                  <div style="background:rgba(255,255,255,0.06);height:14px;border-radius:10px;overflow:hidden">
+                    <div id="dashProgress" style="height:14px;width:0%;background:linear-gradient(90deg,#84fab0,#8fd3f4)"></div>
+                  </div>
+                </div>
+                <div><span id="dashPct" class="kv">0%</span></div>
+              </div>
+              <div style="margin-top:8px" class="small">Saved: <span id="dashSaved">₹0</span> • Remaining: <span id="dashRemaining">₹0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="width:100%; max-width:980px; margin:0 auto;">
+          <div class="label">Transaction History</div>
+          <table class="table" aria-label="Transactions">
+            <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Balance After</th></tr></thead>
+            <tbody id="txTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="section">
-    <h2><i class="fas fa-bullseye"></i> Saving Goal 🎯</h2>
-    <p><span class="label">Goal:</span> <span id="goalName">New Phone</span></p>
-    <p><span class="label">Target:</span> ₹<span id="targetAmount">10000</span></p>
-    <p><span class="label">Saved:</span> ₹<span id="savedAmount">3000</span></p>
+  <!-- fixed logout button (always visible when logged in) -->
+  <button id="btnLogoutFixed" title="Logout">⎋</button>
 
-    <div class="progress-container">
-      <div id="progress" class="progress-bar"></div>
+  <!-- Modals -->
+  <div id="modalChangePass" class="modal"><div class="box">
+    <div class="title">Change Password</div>
+    <input id="curPass" class="input" type="password" placeholder="Current password" />
+    <input id="newPass" class="input" type="password" placeholder="New password (min 6 chars)" />
+    <input id="confirmPass" class="input" type="password" placeholder="Confirm new password" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn primary" onclick="doChangePassword()">Save</button>
+      <button class="btn" onclick="closeModal('modalChangePass')">Cancel</button>
     </div>
+    <div id="changePassMsg" class="small"></div>
+  </div></div>
 
-    <div class="flex-row">
-      <input type="number" id="addAmount" placeholder="Add/Withdraw amount"/>
-      <button class="add-btn" onclick="addSavings()"><i class="fas fa-plus-circle"></i> Add</button>
-      <button class="withdraw-btn" onclick="withdrawSavings()"><i class="fas fa-minus-circle"></i> Withdraw</button>
-      <button class="edit-btn" onclick="toggleEditGoal()"><i class="fas fa-edit"></i> Edit Goal</button>
+  <div id="modalChangePin" class="modal"><div class="box">
+    <div class="title">Change PIN</div>
+    <input id="pinAuthPass" class="input" type="password" placeholder="Enter account password to authorize" />
+    <input id="pinNew" class="input" type="password" placeholder="New PIN (4-6 digits)" />
+    <input id="pinConfirm" class="input" type="password" placeholder="Confirm new PIN" />
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn primary" onclick="doChangePIN()">Save PIN</button>
+      <button class="btn" onclick="closeModal('modalChangePin')">Cancel</button>
     </div>
-
-    <div id="editGoalSection" class="flex-row" style="display:none;">
-      <input type="text" id="newGoalName" placeholder="New Goal Name"/>
-      <input type="number" id="newTargetAmount" placeholder="New Target"/>
-      <button class="save-btn" onclick="saveGoal()"><i class="fas fa-check"></i> Save Goal</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2><i class="fas fa-history"></i> Transaction History</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Date & Time</th>
-          <th>Type</th>
-          <th>Amount (₹)</th>
-          <th>Balance After</th>
-        </tr>
-      </thead>
-      <tbody id="transactionTable">
-      </tbody>
-    </table>
-  </div>
-
-  <footer>
-    💰 Keep saving for a bright future!
-  </footer>
-</div>
+    <div id="changePinMsg" class="small"></div>
+  </div></div>
 
 <script>
-let balance=5000,saved=3000,target=10000,transactions=[];
-
-function updateProgress(){
-  document.getElementById("savedAmount").textContent=saved;
-  document.getElementById("balance").textContent=balance;
-  const progress=Math.min((saved/target)*100,100);
-  document.getElementById("progress").style.width=progress+"%";
+/* ---------- Crypto helper ---------- */
+async function sha256Hex(str){
+  const enc = new TextEncoder();
+  const hash = await crypto.subtle.digest('SHA-256', enc.encode(str));
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function updateName(){
-  const name=document.getElementById("nameInput").value.trim();
-  if(name){document.getElementById("userName").textContent=name; document.getElementById("nameInput").value="";}
+/* ---------- storage ---------- */
+const USERS_KEY = 'piggy_users_v1';
+function loadUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }catch(e){ return {}; } }
+function saveUsers(u){ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+
+/* ensure demo */
+(async function ensureDemo(){
+  const users = loadUsers();
+  if(Object.keys(users).length === 0){
+    const passHash = await sha256Hex('demo123');
+    const pinHash = await sha256Hex('1234');
+    users['demo'] = {
+      username:'demo', email:'demo@example.com', passHash, pinHash,
+      profile:{ name:'Demo User', acc:'000111222', bank:'Demo Bank' },
+      balance:5000, goal:{ name:'New Phone', target:10000, saved:3000 }, txs: []
+    };
+    saveUsers(users);
+  }
+})();
+
+/* ---------- Tabs ---------- */
+document.getElementById('tabLogin').addEventListener('click', ()=>toggleTab('login'));
+document.getElementById('tabSignup').addEventListener('click', ()=>toggleTab('signup'));
+function toggleTab(which){
+  document.getElementById('tabLogin').classList.toggle('active', which==='login');
+  document.getElementById('tabSignup').classList.toggle('active', which==='signup');
+  document.getElementById('loginForm').style.display = which==='login' ? 'block' : 'none';
+  document.getElementById('signupForm').style.display = which==='signup' ? 'block' : 'none';
 }
 
-function addSavings(){
-  const amount=parseInt(document.getElementById("addAmount").value);
-  if(!isNaN(amount)&&amount>0){
-    saved+=amount; balance-=amount;
-    addTransaction("Add",amount,balance);
-    updateProgress(); document.getElementById("addAmount").value="";
-  }else alert("Enter valid amount!");
+/* ---------- Signup & Login ---------- */
+document.getElementById('btnClear').addEventListener('click', ()=> {
+  document.getElementById('signupUsername').value=''; document.getElementById('signupEmail').value=''; document.getElementById('signupPassword').value=''; document.getElementById('signupPin').value='';
+});
+
+document.getElementById('btnSignup').addEventListener('click', async ()=>{
+  const username = (document.getElementById('signupUsername').value||'').trim().toLowerCase();
+  const email = (document.getElementById('signupEmail').value||'').trim();
+  const password = document.getElementById('signupPassword').value||'';
+  const pin = document.getElementById('signupPin').value||'';
+  if(!username || !email || password.length < 6){ document.getElementById('signupMsg').textContent = 'Provide username, email and password (min 6 chars).'; return; }
+  const users = loadUsers();
+  if(users[username]){ document.getElementById('signupMsg').textContent = 'Username already taken.'; return; }
+  const ph = await sha256Hex(password);
+  const pinHash = pin ? await sha256Hex(pin) : null;
+  users[username] = {
+    username, email, passHash:ph, pinHash,
+    profile:{ name: username, acc: String(Math.floor(Math.random()*900000000)+100000000), bank:'Local Bank' },
+    balance: 5000,
+    goal: { name:'Buy a Smartwatch', target:5000, saved:0 },
+    txs: []
+  };
+  saveUsers(users);
+  document.getElementById('signupMsg').textContent = 'Account created. Go to Login.';
+  toggleTab('login');
+  document.getElementById('loginUsername').value = username;
+});
+
+document.getElementById('btnLogin').addEventListener('click', async ()=>{
+  const username = (document.getElementById('loginUsername').value||'').trim().toLowerCase();
+  const password = document.getElementById('loginPassword').value||'';
+  const users = loadUsers();
+  if(!users[username]){ document.getElementById('loginMsg').textContent = 'No such user.'; return; }
+  const ph = await sha256Hex(password);
+  if(ph !== users[username].passHash){ document.getElementById('loginMsg').textContent = 'Incorrect password.'; return; }
+  localStorage.setItem('piggy_current_user', username);
+  document.getElementById('loginMsg').textContent = '';
+  openAppForUser(username);
+});
+
+document.getElementById('btnGuest').addEventListener('click', ()=> {
+  localStorage.setItem('piggy_current_user','demo');
+  openAppForUser('demo');
+});
+
+/* ---------- App open & render ---------- */
+function doLogout(){
+  localStorage.removeItem('piggy_current_user');
+  // hide app, show auth
+  document.getElementById('appArea').style.display = 'none';
+  document.getElementById('authArea').style.display = 'flex';
+  // hide fixed button
+  document.getElementById('btnLogoutFixed').style.display = 'none';
+  // clear sensitive inputs
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('depositAmount').value = '';
+  document.getElementById('dashAmount').value = '';
+  // scroll to top so header visible
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function withdrawSavings(){
-  const amount=parseInt(document.getElementById("addAmount").value);
-  if(!isNaN(amount)&&amount>0&&saved>=amount){
-    saved-=amount; balance+=amount;
-    addTransaction("Withdraw",amount,balance);
-    updateProgress(); document.getElementById("addAmount").value="";
-  }else alert("Invalid or insufficient amount!");
+function openAppForUser(username){
+  const users = loadUsers();
+  const u = users[username];
+  if(!u) return alert('User not found');
+  // hide auth, show app
+  document.getElementById('authArea').style.display = 'none';
+  document.getElementById('appArea').style.display = 'block';
+  // show fixed logout button and attach handler
+  const fixedBtn = document.getElementById('btnLogoutFixed');
+  fixedBtn.style.display = 'block';
+  fixedBtn.onclick = doLogout;
+  // attach header logout as well
+  const headerBtn = document.getElementById('btnLogout');
+  headerBtn.onclick = doLogout;
+
+  renderDashboard(u);
 }
 
-function toggleEditGoal(){document.getElementById("editGoalSection").style.display=document.getElementById("editGoalSection").style.display==='none'?'flex':'none';}
+/* render dashboard */
+function renderDashboard(u){
+  document.getElementById('accName').textContent = u.profile.name || u.username;
+  document.getElementById('accUser').textContent = u.username;
+  document.getElementById('accEmail').textContent = u.email;
+  document.getElementById('accNo').textContent = u.profile.acc || '—';
+  document.getElementById('accBal').textContent = `₹${Number(u.balance).toFixed(2)}`;
 
-function saveGoal(){
-  const newGoal=document.getElementById("newGoalName").value;
-  const newTarget=parseInt(document.getElementById("newTargetAmount").value);
-  if(newGoal&&!isNaN(newTarget)&&newTarget>0){
-    document.getElementById("goalName").textContent=newGoal;
-    document.getElementById("targetAmount").textContent=newTarget;
-    target=newTarget; saved=0;
-    addTransaction("Goal Changed",0,balance,newGoal);
-    updateProgress(); document.getElementById("editGoalSection").style.display='none';
-  }else alert("Enter valid goal details!");
-}
+  document.getElementById('dashGoalName').textContent = u.goal.name;
+  document.getElementById('dashGoalTarget').textContent = `₹${Number(u.goal.target).toFixed(2)}`;
 
-function addTransaction(type,amount,balanceAfter,note=""){
-  const now=new Date();
-  transactions.unshift({date:now.toLocaleString(),type,amount,balanceAfter,note});
-  renderTransactions();
-}
+  document.getElementById('dashSaved').textContent = `₹${Number(u.goal.saved).toFixed(2)}`;
+  const pct = Math.min(100, (u.goal.saved / u.goal.target) * 100 || 0);
+  document.getElementById('dashProgress').style.width = pct + '%';
+  document.getElementById('dashPct').textContent = `${pct.toFixed(1)}%`;
+  document.getElementById('dashRemaining').textContent = `₹${Math.max(0,(u.goal.target - u.goal.saved)).toFixed(2)}`;
 
-function renderTransactions(){
-  const tbody=document.getElementById("transactionTable");
-  tbody.innerHTML="";
-  transactions.forEach(tx=>{
-    const tr=document.createElement("tr");
-    tr.className=tx.type==="Add"?"add-row":tx.type==="Withdraw"?"withdraw-row":"goal-row";
-    tr.innerHTML=`<td>${tx.date}</td><td>${tx.type}</td><td>${tx.amount}</td><td>${tx.balanceAfter}</td>`;
+  // transactions
+  const tbody = document.getElementById('txTable');
+  tbody.innerHTML = '';
+  (u.txs || []).forEach(tx => {
+    const tr = document.createElement('tr');
+    tr.className = tx.type === 'Add' ? 'tx-add' : tx.type === 'Withdraw' ? 'tx-with' : tx.type === 'Deposit' ? 'tx-dep' : 'tx-goal';
+    tr.innerHTML = `<td>${tx.date}</td><td>${tx.type}${tx.note?(' — '+tx.note):''}</td><td>₹${Number(tx.amount).toFixed(2)}</td><td>₹${Number(tx.balanceAfter).toFixed(2)}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-updateProgress();
+/* helpers */
+function getCurrentCtx(){
+  const cur = localStorage.getItem('piggy_current_user');
+  if(!cur) return null;
+  const users = loadUsers();
+  if(!users[cur]) return null;
+  return { users, user: users[cur], username: cur };
+}
+function persistCtx(ctx){
+  ctx.users[ctx.username] = ctx.user;
+  saveUsers(ctx.users);
+}
+
+/* transactions */
+function addTx(ctx, type, amount, note=''){
+  const d = new Date();
+  const tx = { date: d.toLocaleString(), type, amount: Number(amount), balanceAfter: Number(ctx.user.balance), note };
+  ctx.user.txs.unshift(tx);
+  if(ctx.user.txs.length > 400) ctx.user.txs.length = 400;
+  persistCtx(ctx);
+}
+
+/* add to goal (balance -> saved) */
+function dashAdd(){
+  const amt = parseFloat(document.getElementById('dashAmount').value || 0);
+  if(isNaN(amt) || amt <= 0) return alert('Enter valid amount');
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  if(amt > ctx.user.balance) return alert('Insufficient account balance');
+  ctx.user.balance -= amt;
+  ctx.user.goal.saved += amt;
+  addTx(ctx, 'Add', amt);
+  persistCtx(ctx);
+  renderDashboard(ctx.user);
+  document.getElementById('dashAmount').value = '';
+}
+
+/* withdraw (saved -> balance) */
+function dashWithdraw(){
+  const amt = parseFloat(document.getElementById('dashAmount').value || 0);
+  if(isNaN(amt) || amt <= 0) return alert('Enter valid amount');
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  if(amt > ctx.user.goal.saved) return alert('Not enough saved');
+  ctx.user.goal.saved -= amt;
+  ctx.user.balance += amt;
+  addTx(ctx, 'Withdraw', amt);
+  persistCtx(ctx);
+  renderDashboard(ctx.user);
+  document.getElementById('dashAmount').value = '';
+}
+
+/* deposit to bank (increase balance) */
+function depositToBank(){
+  const amt = parseFloat(document.getElementById('depositAmount').value || 0);
+  if(isNaN(amt) || amt <= 0) return alert('Enter valid deposit amount');
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  ctx.user.balance += amt;
+  addTx(ctx, 'Deposit', amt);
+  persistCtx(ctx);
+  renderDashboard(ctx.user);
+  document.getElementById('depositAmount').value = '';
+}
+
+/* edit goal */
+function openEditGoal(){ document.getElementById('editGoalBox').style.display = 'block'; }
+function closeEditGoal(){ document.getElementById('editGoalBox').style.display = 'none'; }
+function saveGoalFromDash(){
+  const name = (document.getElementById('editGoalName').value || '').trim();
+  const target = parseFloat(document.getElementById('editGoalTarget').value || 0);
+  if(!name || isNaN(target) || target <= 0) return alert('Enter valid goal name and target');
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  ctx.user.goal.name = name;
+  ctx.user.goal.target = target;
+  addTx(ctx, 'Goal Changed', 0, name);
+  persistCtx(ctx);
+  closeEditGoal(); renderDashboard(ctx.user);
+}
+
+/* change name */
+function changeNameFromInput(){
+  const v = (document.getElementById('changeNameInput').value || '').trim();
+  if(!v) return alert('Enter a name');
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  ctx.user.profile.name = v;
+  persistCtx(ctx);
+  document.getElementById('changeNameInput').value = '';
+  renderDashboard(ctx.user);
+}
+
+/* download statement */
+function downloadStatement(){
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  let out = `Digital Piggy Bank Statement\nName: ${ctx.user.profile.name}\nUsername: ${ctx.user.username}\n\nTransactions:\n`;
+  ctx.user.txs.slice().reverse().forEach(tx => { out += `${tx.date} — ${tx.type} — ₹${tx.amount.toFixed(2)} — Balance: ₹${tx.balanceAfter.toFixed(2)}\n`; });
+  const blob = new Blob([out], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'piggy_statement.txt'; a.click();
+}
+
+/* change password & pin modal */
+function openModal(id){ document.getElementById(id).style.display = 'flex'; }
+function closeModal(id){ document.getElementById(id).style.display = 'none'; }
+
+async function doChangePassword(){
+  const cur = (document.getElementById('curPass').value||'').trim();
+  const nw = (document.getElementById('newPass').value||'').trim();
+  const cf = (document.getElementById('confirmPass').value||'').trim();
+  if(!cur || !nw || !cf) { document.getElementById('changePassMsg').textContent = 'Fill all fields'; return; }
+  if(nw.length < 6){ document.getElementById('changePassMsg').textContent = 'New password must be >=6 chars'; return; }
+  if(nw !== cf){ document.getElementById('changePassMsg').textContent = 'New passwords do not match'; return; }
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  const curHash = await sha256Hex(cur);
+  if(curHash !== ctx.user.passHash){ document.getElementById('changePassMsg').textContent = 'Current password incorrect'; return; }
+  ctx.user.passHash = await sha256Hex(nw);
+  persistCtx(ctx);
+  document.getElementById('changePassMsg').textContent = 'Password changed ✓';
+  setTimeout(()=> closeModal('modalChangePass'),700);
+}
+
+async function doChangePIN(){
+  const auth = (document.getElementById('pinAuthPass').value||'').trim();
+  const npin = (document.getElementById('pinNew').value||'').trim();
+  const cp = (document.getElementById('pinConfirm').value||'').trim();
+  if(!auth || !npin || !cp){ document.getElementById('changePinMsg').textContent='Fill all fields'; return; }
+  if(npin !== cp){ document.getElementById('changePinMsg').textContent='PINs do not match'; return; }
+  if(npin.length < 4 || npin.length > 6){ document.getElementById('changePinMsg').textContent='PIN should be 4-6 digits'; return; }
+  const ctx = getCurrentCtx(); if(!ctx) return alert('Not logged in');
+  const aHash = await sha256Hex(auth);
+  if(aHash !== ctx.user.passHash){ document.getElementById('changePinMsg').textContent='Password incorrect'; return; }
+  ctx.user.pinHash = await sha256Hex(npin);
+  persistCtx(ctx);
+  document.getElementById('changePinMsg').textContent = 'PIN updated ✓';
+  setTimeout(()=> closeModal('modalChangePin'),700);
+}
+
+/* on load: auto-open if logged in */
+(function init(){
+  const cur = localStorage.getItem('piggy_current_user');
+  if(cur){
+    const users = loadUsers();
+    if(users[cur]) openAppForUser(cur);
+    else localStorage.removeItem('piggy_current_user');
+  }
+})();
 </script>
 </body>
 </html>
